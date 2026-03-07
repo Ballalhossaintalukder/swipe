@@ -3,6 +3,7 @@ package me.saket.swipe.sample
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
@@ -42,7 +43,6 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import me.saket.swipe.SwipeAction
 import me.saket.swipe.SwipeableActionsBox
 import me.saket.swipe.sample.theme.DarkTheme
@@ -52,20 +52,13 @@ import me.saket.swipe.sample.theme.LightTheme
 class SampleActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+    enableEdgeToEdge()
 
     setContent {
-      val uiController = rememberSystemUiController()
-      val systemInDarkTheme = isSystemInDarkTheme()
-      LaunchedEffect(Unit) {
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        uiController.setSystemBarsColor(Color.Transparent, darkIcons = !systemInDarkTheme)
-        uiController.setNavigationBarColor(Color.Transparent)
-      }
-
-      val colors = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        if (systemInDarkTheme) dynamicDarkColorScheme(this) else dynamicLightColorScheme(this)
+      val colors = if (isSystemInDarkTheme()) {
+        dynamicDarkColorScheme(this)
       } else {
-        if (systemInDarkTheme) DarkTheme else LightTheme
+        dynamicLightColorScheme(this)
       }
 
       MaterialTheme(colors) {

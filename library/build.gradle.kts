@@ -1,6 +1,7 @@
 plugins {
   alias(libs.plugins.android.library)
   alias(libs.plugins.kotlin.multiplatform)
+  alias(libs.plugins.kotlin.compose)
   alias(libs.plugins.compose.multiplatform)
   alias(libs.plugins.mavenPublish)
   alias(libs.plugins.paparazzi)
@@ -8,7 +9,7 @@ plugins {
 
 kotlin {
   @Suppress("OPT_IN_USAGE")
-  targetHierarchy.default()
+  applyDefaultHierarchyTemplate()
 
   androidTarget()
   jvm()
@@ -38,16 +39,13 @@ kotlin {
 
 android {
   namespace = "me.saket.swipe"
+  compileSdk = libs.versions.compileSdk.get().toInt()
 
   defaultConfig {
     minSdk = libs.versions.minSdk.get().toInt()
-    compileSdk = libs.versions.compileSdk.get().toInt()
   }
   buildFeatures {
     compose = true
-  }
-  composeOptions {
-    kotlinCompilerExtensionVersion = libs.versions.androidx.compose.compiler.get()
   }
   java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(11))

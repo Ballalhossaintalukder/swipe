@@ -1,24 +1,22 @@
 plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.kotlin.android)
+  alias(libs.plugins.kotlin.compose)
 }
 
 android {
   namespace = "me.saket.swipe.sample"
+  compileSdk = libs.versions.compileSdk.get().toInt()
 
   defaultConfig {
     applicationId = namespace
-    minSdk = libs.versions.minSdk.get().toInt()
-    compileSdk = libs.versions.compileSdk.get().toInt()
+    minSdk = 31
     targetSdk = libs.versions.compileSdk.get().toInt()
     versionCode = 1
     versionName = "1.0"
   }
   buildFeatures {
     compose = true
-  }
-  composeOptions {
-    kotlinCompilerExtensionVersion = libs.versions.androidx.compose.compiler.get()
   }
   java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(11))
@@ -36,5 +34,4 @@ dependencies {
   implementation(libs.compose.ui)
   implementation(libs.compose.material3)
   implementation(libs.compose.materialIcons)
-  implementation(libs.accompanist.systemUi)
 }
