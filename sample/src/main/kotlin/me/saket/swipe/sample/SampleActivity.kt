@@ -1,6 +1,5 @@
 package me.saket.swipe.sample
 
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -31,7 +30,6 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -42,11 +40,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.view.WindowCompat
 import me.saket.swipe.SwipeAction
 import me.saket.swipe.SwipeableActionsBox
-import me.saket.swipe.sample.theme.DarkTheme
-import me.saket.swipe.sample.theme.LightTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 class SampleActivity : AppCompatActivity() {

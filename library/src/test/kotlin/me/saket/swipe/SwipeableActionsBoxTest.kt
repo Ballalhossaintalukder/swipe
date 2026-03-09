@@ -38,8 +38,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import app.cash.paparazzi.DeviceConfig
 import app.cash.paparazzi.Paparazzi
-import app.cash.paparazzi.androidHome
-import app.cash.paparazzi.detectEnvironment
 import com.android.ide.common.rendering.api.SessionParams.RenderingMode
 import org.junit.Rule
 import org.junit.Test
