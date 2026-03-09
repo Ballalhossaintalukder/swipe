@@ -4,46 +4,41 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.twotone.Archive
-import androidx.compose.material.icons.twotone.ReplyAll
-import androidx.compose.material.icons.twotone.Snooze
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.filled.Create
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import me.saket.swipe.SwipeAction
-import me.saket.swipe.SwipeableActionsBox
 
-@OptIn(ExperimentalMaterial3Api::class)
 class SampleActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -55,108 +50,182 @@ class SampleActivity : AppCompatActivity() {
       } else {
         dynamicLightColorScheme(this)
       }
-
       MaterialTheme(colors) {
         Scaffold(
-          topBar = {
-            TopAppBar(title = { Text(stringResource(R.string.app_name)) })
-          }
-        ) { contentPadding ->
-          LazyColumn(Modifier.padding(contentPadding).fillMaxSize()) {
-            items(20) { index ->
-              SwipeableBoxPreview(
-                Modifier.fillMaxWidth()
-              )
+          containerColor = MaterialTheme.colorScheme.secondaryContainer,
+          floatingActionButton = {
+            ComposeButton()
+          },
+        ) { innerPadding ->
+          Column(
+            modifier = Modifier
+              .fillMaxSize()
+              .padding(innerPadding),
+          ) {
+            Text(
+              text = "Inbox",
+              color = MaterialTheme.colorScheme.secondary,
+              style = MaterialTheme.typography.titleMedium,
+              modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+            )
+
+            LazyColumn(
+              verticalArrangement = Arrangement.spacedBy(2.dp),
+              modifier = Modifier.fillMaxSize(),
+            ) {
+              items(MailThreads) { thread ->
+                EmailItem(thread)
+              }
+              item {
+                Spacer(Modifier.height(72.dp))
+              }
             }
           }
         }
       }
     }
   }
-}
 
-@Composable
-private fun SwipeableBoxPreview(modifier: Modifier = Modifier) {
-  var isSnoozed by rememberSaveable { mutableStateOf(false) }
-  var isArchived by rememberSaveable { mutableStateOf(false) }
-
-  val replyAll = SwipeAction(
-    icon = rememberVectorPainter(Icons.TwoTone.ReplyAll),
-    background = Color.Perfume,
-    onSwipe = { println("Reply swiped") },
-    isUndo = false,
-  )
-  val snooze = SwipeAction(
-    icon = rememberVectorPainter(Icons.TwoTone.Snooze),
-    background = Color.SeaBuckthorn,
-    onSwipe = { isSnoozed = !isSnoozed },
-    isUndo = isSnoozed,
-  )
-  val archive = SwipeAction(
-    icon = rememberVectorPainter(Icons.TwoTone.Archive),
-    background = Color.Fern,
-    onSwipe = { isArchived = !isArchived },
-    isUndo = isArchived,
-  )
-
-  SwipeableActionsBox(
-    modifier = modifier,
-    startActions = listOf(replyAll),
-    endActions = listOf(snooze, archive),
-    swipeThreshold = 40.dp,
-    backgroundUntilSwipeThreshold = MaterialTheme.colorScheme.surfaceColorAtElevation(40.dp)
-  ) {
-    BatmanIpsumItem(
-      isSnoozed = isSnoozed
+  @Composable
+  @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+  private fun EmailItem(thread: MailThread) {
+    ListItem(
+      modifier = Modifier.fillMaxWidth(),
+      onClick = {},
+      leadingContent = {
+        Box(
+          modifier = Modifier
+            .size(40.dp)
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.secondaryContainer),
+        )
+      },
+      content = {
+        Column(
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 12.dp),
+        ) {
+          Text(
+            text = thread.sender,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = if (thread.unread) FontWeight.SemiBold else FontWeight.Normal,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+          )
+          Text(
+            text = thread.subject,
+            fontWeight = if (thread.unread) FontWeight.SemiBold else FontWeight.Normal,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+          )
+          Text(
+            text = thread.preview,
+            color = LocalContentColor.current.copy(alpha = 0.7f),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+          )
+        }
+      },
+      trailingContent = {
+        Text(
+          text = thread.time,
+          style = MaterialTheme.typography.bodyMedium,
+          color = LocalContentColor.current.copy(alpha = 0.7f),
+        )
+      },
+      contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
     )
   }
-}
 
-@Composable
-private fun BatmanIpsumItem(
-  modifier: Modifier = Modifier,
-  isSnoozed: Boolean
-) {
-  Row(
-    modifier
-      .fillMaxWidth()
-      .shadow(1.dp)
-      .background(MaterialTheme.colorScheme.surfaceColorAtElevation(8.dp))
-      .padding(vertical = 16.dp, horizontal = 20.dp)
-      .animateContentSize()
-  ) {
-    Box(
-      Modifier
-        .padding(top = 2.dp)
-        .size(52.dp)
-        .background(MaterialTheme.colorScheme.primary, CircleShape)
-    )
-
-    Column(Modifier.padding(horizontal = 16.dp)) {
-      Text(
-        text = "The Batman",
-        style = MaterialTheme.typography.titleMedium
+  @Composable
+  private fun ComposeButton() {
+    ExtendedFloatingActionButton(
+      modifier = Modifier.padding(bottom = 28.dp),
+      containerColor = MaterialTheme.colorScheme.primary,
+      onClick = {},
+    ) {
+      Icon(
+        imageVector = Icons.Filled.Create,
+        contentDescription = null,
+      )
+      Spacer(
+        Modifier.width(8.dp)
       )
       Text(
-        modifier = Modifier.padding(top = 4.dp),
-        text = "Fear is a tool. When that light hits the sky, it’s not just a call. It’s a warning. For them.",
-        style = MaterialTheme.typography.bodyMedium
+        text = "Compose",
+        style = MaterialTheme.typography.titleMedium,
+        fontWeight = FontWeight.Medium,
       )
-
-      if (isSnoozed) {
-        Text(
-          modifier = Modifier
-            .padding(top = 16.dp)
-            .background(Color.SeaBuckthorn.copy(alpha = 0.4f), RoundedCornerShape(4.dp))
-            .padding(horizontal = 8.dp, vertical = 4.dp),
-          text = "Snoozed until tomorrow",
-          style = MaterialTheme.typography.labelLarge
-        )
-      }
     }
   }
-}
 
-val Color.Companion.SeaBuckthorn get() = Color(0xFFF9A825)
-val Color.Companion.Fern get() = Color(0xFF66BB6A)
-val Color.Companion.Perfume get() = Color(0xFFD0BCFF)
+  private data class MailThread(
+    val sender: String,
+    val subject: String,
+    val preview: String,
+    val time: String,
+    val unread: Boolean,
+  )
+
+  companion object {
+    private val MailThreads = listOf(
+      MailThread(
+        sender = "Annie, Rob, Jess, me",
+        subject = "Trip to Helen’s",
+        preview = "Woohoo! Helen sent a helpful pdf in case...",
+        time = "Now",
+        unread = true,
+      ),
+      MailThread(
+        sender = "Transatlantic Air",
+        subject = "Your itinerary is confirmed: BGZUAW",
+        preview = "We’ve got you covered with all the details...",
+        time = "11:35 AM",
+        unread = true,
+      ),
+      MailThread(
+        sender = "Times & Tribune",
+        subject = "Your June issue arrives today!",
+        preview = "Get ready for exciting summer stories arri...",
+        time = "10:23 AM",
+        unread = true,
+      ),
+      MailThread(
+        sender = "Helen, Annie, me",
+        subject = "Checking in",
+        preview = "Hey Annie - Thanks for reaching out! Thin...",
+        time = "10:11 AM",
+        unread = false,
+      ),
+      MailThread(
+        sender = "Maanika Manohoran",
+        subject = "Revised organic search numbers",
+        preview = "We foresee some big smiles ahead! We’ll...",
+        time = "May 19",
+        unread = false,
+      ),
+      MailThread(
+        sender = "Addie Lane",
+        subject = "It’s that time of year again...",
+        preview = "Hi friends, it’s happening! Time to dust off...",
+        time = "May 19",
+        unread = false,
+      ),
+      MailThread(
+        sender = "Justin, Curtis, Blake, me",
+        subject = "Call Summary",
+        preview = "That sounds perfect! Thank you again...",
+        time = "May 20",
+        unread = false,
+      ),
+      MailThread(
+        sender = "Virtual Bank",
+        subject = "Important update for your account",
+        preview = "We’ve received your Virtual Signature a...",
+        time = "May 19",
+        unread = false,
+      ),
+    )
+  }
+}
