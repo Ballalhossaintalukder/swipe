@@ -18,17 +18,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
@@ -38,6 +39,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import me.saket.swipe2.SwipeToReveal
+import me.saket.swipe2.rememberSwipeToRevealState
 
 class SampleActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,11 +73,17 @@ class SampleActivity : AppCompatActivity() {
             )
 
             LazyColumn(
+              modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 8.dp),
               verticalArrangement = Arrangement.spacedBy(2.dp),
-              modifier = Modifier.fillMaxSize(),
             ) {
-              items(MailThreads) { thread ->
-                EmailItem(thread)
+              itemsIndexed(MailThreads) { index, thread ->
+                SwipeableEmailItem(
+                  thread = thread,
+                  index = index,
+                  count = MailThreads.size,
+                )
               }
               item {
                 Spacer(Modifier.height(72.dp))
@@ -88,8 +97,22 @@ class SampleActivity : AppCompatActivity() {
 
   @Composable
   @OptIn(ExperimentalMaterial3ExpressiveApi::class)
-  private fun EmailItem(thread: MailThread) {
-    ListItem(
+  private fun SwipeableEmailItem(thread: MailThread, index: Int, count: Int) {
+    SwipeToReveal(
+      state = rememberSwipeToRevealState()
+    ) {
+      EmailItem(
+        thread = thread,
+        index = index,
+        count = count,
+      )
+    }
+  }
+
+  @Composable
+  @OptIn(ExperimentalMaterial3ExpressiveApi::class)
+  private fun EmailItem(thread: MailThread, index: Int, count: Int) {
+    SegmentedListItem(
       modifier = Modifier.fillMaxWidth(),
       onClick = {},
       leadingContent = {
@@ -130,11 +153,15 @@ class SampleActivity : AppCompatActivity() {
       trailingContent = {
         Text(
           text = thread.time,
-          style = MaterialTheme.typography.bodyMedium,
+          style = MaterialTheme.typography.bodySmallEmphasized,
           color = LocalContentColor.current.copy(alpha = 0.7f),
         )
       },
       contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
+      shapes = ListItemDefaults.segmentedShapes(
+        index = index,
+        count = count,
+      ),
     )
   }
 
